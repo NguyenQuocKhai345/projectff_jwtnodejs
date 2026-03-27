@@ -1,4 +1,4 @@
-# hash password: bcrypt
+
 
 Các bước cài đặt: (chế độ development)
 1. clone code

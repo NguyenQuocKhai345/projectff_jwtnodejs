@@ -11,7 +11,7 @@ import {
 import RegisterPage from './pages/register.jsx';
 import HomePage from './pages/home.jsx';
 import UserPage from './pages/user.jsx';
-import LoginPage from './pages/lohin.jsx';
+import LoginPage from './pages/login.jsx';
 
 const router = createBrowserRouter([
   {
