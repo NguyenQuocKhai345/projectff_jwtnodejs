@@ -11,16 +11,24 @@ const RegisterPage = () => {
 
         const res = await createUserApi(name, email, password);
 
-        if (res) {
+        if (res && res.EC === 1) {
+            notification.error({
+                message: 'Register failed',
+                description: res.EM
+            });
+        }
+
+
+        else if (res) {
             notification.success({
                 message: 'Register successfully',
-                decription: "Success"
+                description: "Success"
             });
             navigate('/login');
         } else {
             notification.error({
                 message: 'Register failed',
-                decription: "Error"
+                description: "Error"
             });
         }
 

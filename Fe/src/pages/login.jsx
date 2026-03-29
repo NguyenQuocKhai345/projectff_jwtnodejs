@@ -13,7 +13,7 @@ const LoginPage = () => {
 
         // debugger;
 
-        if (res && res.data.EC === 0) {
+        if (res && res.EC === 0) {
             localStorage.setItem("access_token", res.access_token); // lưu token vào localStorage
             notification.success({
                 message: 'Login successfully',
@@ -24,7 +24,7 @@ const LoginPage = () => {
         } else {
             notification.error({
                 message: 'Login failed',
-                description: res?.data.EM ?? "Error"
+                description: res?.EM ?? "Error"
             });
         }
         //debugger;

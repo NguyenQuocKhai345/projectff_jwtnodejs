@@ -6,6 +6,15 @@ const saltRounds = 10;
 
 const createUserService = async (name, email, password) => {
     try {
+        //check email exist
+        const user = await User.findOne({ email });
+        if (user) {
+            return {
+                EC: 1,
+                EM: "Email đã tồn tại, vui lòng chọn email khác"
+            }
+        }
+
         // Hash the password before saving it
         // const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -70,9 +79,19 @@ const loginService = async (email, password) => {
     }
 }
 
+const getUserService = async () => {
+    try {
+        let result = await User.find({}, { password: 0 });
+        return result;
 
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
 
 module.exports = {
     createUserService,
-    loginService
+    loginService,
+    getUserService
 }
