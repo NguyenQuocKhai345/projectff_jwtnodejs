@@ -18,9 +18,13 @@ const auth = (req, res, next) => {
             //verify
             try {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET,)
+                res.user = {
+                    email: decoded.email,
+                    name: decoded.name,
+                }
+
+
                 console.log("Decoded token:", decoded);
-
-
                 console.log("Token received in delay middleware:", token);
                 next();
 
