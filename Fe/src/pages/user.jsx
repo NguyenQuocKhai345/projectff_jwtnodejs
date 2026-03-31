@@ -35,6 +35,10 @@ const UserPage = () => {
             title: 'Email',
             dataIndex: 'email',
         },
+        {
+            title: 'Role',
+            dataIndex: 'role',
+        },
     ];
 
 

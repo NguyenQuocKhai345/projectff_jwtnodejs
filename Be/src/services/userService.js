@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const saltRounds = 10;
 
-const createUserService = async (name, email, password) => {
+const createUserService = async (name, email, password, role) => {
     try {
         //check email exist
         const user = await User.findOne({ email });
@@ -22,7 +22,8 @@ const createUserService = async (name, email, password) => {
         let result = await User.create({
             name: name,
             email: email,
-            password: hashedPassword
+            password: hashedPassword,
+            role: role
         })
         return result;
 

@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
-import { Button, Form, Input, notification } from 'antd';
+import { Button, Col, Divider, Form, Input, notification, Row } from 'antd';
 import { loginApi } from '../util/api';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../components/context/auth.context';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -13,93 +14,90 @@ const LoginPage = () => {
 
         const res = await loginApi(email, password);
 
-        // debugger;
-
         if (res && res.EC === 0) {
-            localStorage.setItem("access_token", res.access_token); // lưu token vào localStorage
+            localStorage.setItem("access_token", res.access_token)
             notification.success({
-                message: 'Login successfully',
+                message: "LOGIN USER",
                 description: "Success"
             });
-            navigate('/');
             setAuth({
                 isAuthenticated: true,
                 user: {
                     email: res?.user?.email ?? "",
-                    name: res?.user?.name ?? "",
+                    name: res?.user?.name ?? ""
                 }
-            });
+            })
+            navigate("/");
 
         } else {
             notification.error({
-                message: 'Login failed',
-                description: res?.EM ?? "Error"
-            });
+                message: "LOGIN USER",
+                description: res?.EM ?? "error"
+            })
         }
-        //debugger;
 
-        console.log('Success:', res);
-        // console.log('Success:', values);
     };
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-    };
+
     return (
-        <div style={{ margin: 50 }}>
-            <Form
-                name="basic"
-                labelCol={{
-                    span: 8,
-                }}
-                wrapperCol={{
-                    span: 16,
-                }}
-                style={{
-                    maxWidth: 600,
-                }}
-                initialValues={{
-                    remember: true,
-                }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
-                layout="vertical"
-            >
-                <Form.Item
-                    label="Email"
-                    name="email"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please input your email!',
-                        },
-                    ]}
-                >
-                    <Input />
-                </Form.Item>
-                <Form.Item
-                    label="Password"
-                    name="password"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please input your password!',
-                        },
-                    ]}
-                >
-                    <Input.Password />
-                </Form.Item>
+        <Row justify={"center"} style={{ marginTop: "30px" }}>
+            <Col xs={24} md={16} lg={8}>
+                <fieldset style={{
+                    padding: "15px",
+                    margin: "5px",
+                    border: "1px solid #ccc",
+                    borderRadius: "5px"
+                }}>
+                    <legend>Đăng Nhập</legend>
+                    <Form
+                        name="basic"
+                        onFinish={onFinish}
+                        autoComplete="off"
+                        layout='vertical'
+                    >
+                        <Form.Item
+                            label="Email"
+                            name="email"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input your email!',
+                                },
+                            ]}
+                        >
+                            <Input />
+                        </Form.Item>
 
-                <Form.Item
+                        <Form.Item
+                            label="Password"
+                            name="password"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input your password!',
+                                },
+                            ]}
+                        >
+                            <Input.Password />
+                        </Form.Item>
 
-                >
-                    <Button type="primary" htmlType="submit">
-                        Login
-                    </Button>
-                </Form.Item>
-            </Form>
-        </div>
 
-    );
+
+                        <Form.Item
+                        >
+                            <Button type="primary" htmlType="submit">
+                                Login
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                    <Link to={"/"}><ArrowLeftOutlined /> Quay lại trang chủ</Link>
+                    <Divider />
+                    <div style={{ textAlign: "center" }}>
+                        Chưa có tài khoản? <Link to={"/register"}>Đăng ký tại đây</Link>
+                    </div>
+                </fieldset>
+            </Col>
+        </Row>
+    )
 }
 
 export default LoginPage;
