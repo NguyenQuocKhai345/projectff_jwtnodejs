@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const auth = (req, res, next) => {
     // Check if the request path is in the white list
-    const white_lists = ["/", "/login", "/register"]
+    const white_lists = ["/", "/login", "/register"];
     //console.log(">>>check url:", req.originalUrl);
     if (white_lists.find(item => '/v1/api' + item === req.originalUrl)) {
         next();
@@ -46,6 +46,7 @@ const auth = (req, res, next) => {
 
 const checkRole = (allowedRoles) => {
     return (req, res, next) => {
+        console.log("Qua check role")
         if (!req.user || !allowedRoles.includes(req.user.role)) {
             console.log(">>>check user role:", req.user);
             return res.status(403).json({

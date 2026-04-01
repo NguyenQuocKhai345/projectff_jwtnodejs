@@ -2,6 +2,7 @@ const express = require('express');
 const { createUser, handleLogin, getUser, getAccount } = require('../controllers/userController');
 const delay = require('../middleware/delay');
 const { auth, checkRole } = require('../middleware/auth');
+const { createDoctor } = require('../controllers/adminController.js');
 
 const routerAPI = express.Router();
 
@@ -27,8 +28,11 @@ routerAPI.get('/', (req, res) => {
 
 routerAPI.post("/register", createUser)
 routerAPI.post("/login", handleLogin)
-routerAPI.get("/users", checkRole(["ADMIN"]), getUser)
+
 routerAPI.get("/account", getAccount);
 
+//admin route
+routerAPI.get("/users", checkRole(["ADMIN"]), getUser)
+routerAPI.post("/create-doctor", checkRole(["ADMIN"]), createDoctor)
 
 module.exports = routerAPI; //export default
