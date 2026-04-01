@@ -35,7 +35,7 @@ const Header = () => {
             key: 'home',
             icon: <HomeOutlined />,
         },
-        ...(auth?.isAuthenticated ? [{
+        ...(auth?.isAuthenticated && auth?.user?.role === 'ADMIN' ? [{
             label: <Link to="/user">Users</Link>,
             key: 'user',
             icon: <UsergroupAddOutlined />,

@@ -1,20 +1,20 @@
-import { notification, Table } from "antd";
+import { notification, Table, Button, Space } from "antd";
 import { useEffect, useState } from "react";
 import { getUserApi } from "../util/api";
 
 const UserPage = () => {
     const [dataSource, setDataSource] = useState([]);
+    const [filterRole, setFilterRole] = useState('PATIENT');
 
     useEffect(() => {
         const fetchUser = async () => {
-            // Implementation for fetching user data
             const res = await getUserApi();
             if (!res?.message) {
                 setDataSource(res);
             }
             else {
                 notification.error({
-                    message: "Unothorized",
+                    message: "Unauthorized",
                     description: res.message
                 })
             }
@@ -41,14 +41,33 @@ const UserPage = () => {
         },
     ];
 
+    const roleOptions = [
+        { key: 'PATIENT', label: 'Bệnh nhân' },
+        { key: 'DOCTOR', label: 'Bác sĩ' },
+    ];
+
+    const filteredData = dataSource.filter(item => item.role === filterRole);
 
     return (
         <div style={{ padding: 50 }}>
+            <Space style={{ marginBottom: 24 }}>
+                {roleOptions.map((role) => (
+                    <Button
+                        key={role.key}
+                        type={filterRole === role.key ? 'primary' : 'default'}
+                        onClick={() => setFilterRole(role.key)}
+                    >
+                        {role.label}
+                    </Button>
+                ))}
+            </Space>
             <Table
                 bordered
-                dataSource={dataSource} columns={columns}
-                rowKey={"_id"} />
-
+                dataSource={filteredData}
+                columns={columns}
+                rowKey={"_id"}
+                locale={{ emptyText: `Chưa có ${filterRole === 'PATIENT' ? 'bệnh nhân' : 'bác sĩ'} nào` }}
+            />
         </div>
     );
 }

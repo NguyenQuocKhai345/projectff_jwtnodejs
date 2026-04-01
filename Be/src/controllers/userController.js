@@ -1,4 +1,4 @@
-const { createUserService, loginService, getUserService } = require('../services/userService');
+const { createUserService, loginService, getUserService, getAccountService } = require('../services/userService');
 
 const createUser = async (req, res) => {
     console.log(">>> check req.body: ", req.body)
@@ -19,7 +19,16 @@ const getUser = async (req, res) => {
 }
 
 const getAccount = async (req, res) => {
-    return res.status(200).json(req.user)
+    try {
+        const data = await getAccountService(req.user.email);
+        if (!data) {
+            return res.status(404).json({ message: "Không tìm thấy tài khoản" });
+        }
+        return res.status(200).json(data);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Lỗi server" });
+    }
 }
 
 module.exports = {

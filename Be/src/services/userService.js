@@ -93,8 +93,19 @@ const getUserService = async () => {
     }
 }
 
+const getAccountService = async (email) => {
+    try {
+        let user = await User.findOne({ email }, { password: 0 });
+        return user;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
 module.exports = {
     createUserService,
     loginService,
-    getUserService
+    getUserService,
+    getAccountService
 }

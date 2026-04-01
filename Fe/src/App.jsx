@@ -27,13 +27,13 @@ function App() {
       setAppLoading(true);
       try {
         const res = await axios.get(`/v1/api/account`);
-        if (res && res._id) { // Nếu BE trả về user hợp lệ
+        if (res && res.email) { // Nếu BE trả về user hợp lệ
           setAuth({
             isAuthenticated: true,
             user: {
               email: res.email,
               name: res.name,
-              role: res.role // Quan trọng cho bước làm Admin tiếp theo
+              role: res.role || ""
             }
           });
         } else {
