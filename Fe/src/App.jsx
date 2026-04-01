@@ -14,29 +14,43 @@ function App() {
   const { setAuth, appLoading, setAppLoading } = useContext(AuthContext);
 
   useEffect(() => {
-
     const fetchAccount = async () => {
+      const token = localStorage.getItem("access_token");
 
-      setAppLoading(true);
-
-      const res = await axios.get(`/v1/api/account`)
-      if (res && !res.message) {
-        setAuth({
-          isAuthenticated: true,
-          user:
-          {
-            email: res.email,
-            name: res.name,
-          }
-        })
+      // TRƯỜNG HỢP 1: Không có token -> Không gọi API, tắt loading luôn
+      if (!token) {
+        setAppLoading(false);
+        return;
       }
 
-      setAppLoading(false);
-      console.log(">>> check data: ", res)
+      // TRƯỜNG HỢP 2: Có token -> Gọi API kiểm tra
+      setAppLoading(true);
+      try {
+        const res = await axios.get(`/v1/api/account`);
+        if (res && res._id) { // Nếu BE trả về user hợp lệ
+          setAuth({
+            isAuthenticated: true,
+            user: {
+              email: res.email,
+              name: res.name,
+              role: res.role // Quan trọng cho bước làm Admin tiếp theo
+            }
+          });
+        } else {
+          // Nếu BE trả về lỗi (như token hết hạn)
+          localStorage.removeItem("access_token");
+        }
+      } catch (error) {
+        // Khi API lỗi 401, xóa token rác để lần sau mở trang không bị gọi lại
+        localStorage.removeItem("access_token");
+        console.log(">>> Check token error: ", error);
+      } finally {
+        // Dù thành công hay lỗi cũng phải tắt xoay xoay
+        setAppLoading(false);
+      }
     }
-    fetchAccount()
-  }, [])
-
+    fetchAccount();
+  }, []);
   return (
     <div>
       {appLoading === true ?

@@ -1,7 +1,7 @@
 const express = require('express');
 const { createUser, handleLogin, getUser, getAccount } = require('../controllers/userController');
 const delay = require('../middleware/delay');
-const auth = require('../middleware/auth');
+const { auth, checkRole } = require('../middleware/auth');
 
 const routerAPI = express.Router();
 
@@ -27,7 +27,7 @@ routerAPI.get('/', (req, res) => {
 
 routerAPI.post("/register", createUser)
 routerAPI.post("/login", handleLogin)
-routerAPI.get("/users", getUser)
+routerAPI.get("/users", checkRole(["ADMIN"]), getUser)
 routerAPI.get("/account", getAccount);
 
 

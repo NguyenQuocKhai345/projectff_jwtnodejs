@@ -11,6 +11,24 @@ const Header = () => {
     console.log(">>>check auth:", auth)
 
 
+    const handleMenuClick = (e) => {
+        console.log('click ', e);
+        if (e.key === 'logout') {
+            localStorage.removeItem("access_token");
+            setAuth({
+                isAuthenticated: false,
+                user: {
+                    email: "",
+                    name: "",
+                    role: ""
+                }
+            });
+            navigate("/");
+            return;
+        }
+        setCurrent(e.key);
+    };
+
     const items = [
         {
             label: <Link to="/">Home Page</Link>,
@@ -29,21 +47,10 @@ const Header = () => {
             children: [
                 ...(auth?.isAuthenticated ? [
                     {
-                        label: <span onClick={() => {
-                            localStorage.clear("access_token");
-                            setCurrent("home");
-                            navigate("/")
-
-                            setAuth({
-                                isAuthenticated: false,
-                                user: {
-                                    email: "",
-                                    name: "",
-                                }
-                            });
-                        }}>Đăng Xuất</span>,
+                        label: 'Đăng Xuất',
                         key: 'logout',
-                    },] : [
+                    },
+                ] : [
                     {
                         label: <Link to="/login">Đăng Nhập</Link>,
                         key: 'login',
@@ -51,19 +58,12 @@ const Header = () => {
                     {
                         label: <Link to="/register">Đăng Ký</Link>,
                         key: 'register',
-                    }]),
-
-
-
+                    },
+                ]),
             ],
         },
-
     ];
-    const [current, setCurrent] = useState('mail');
-    const onClick = (e) => {
-        console.log('click ', e);
-        setCurrent(e.key);
-    };
-    return <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />;
+    const [current, setCurrent] = useState('home');
+    return <Menu onClick={handleMenuClick} selectedKeys={[current]} mode="horizontal" items={items} />;
 };
 export default Header;

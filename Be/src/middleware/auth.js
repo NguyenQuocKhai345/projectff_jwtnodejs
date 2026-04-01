@@ -18,14 +18,15 @@ const auth = (req, res, next) => {
             //verify
             try {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET,)
-                res.user = {
+                req.user = {
                     email: decoded.email,
                     name: decoded.name,
+                    role: decoded.role
                 }
 
 
                 console.log("Decoded token:", decoded);
-                console.log("Token received in delay middleware:", token);
+                console.log("Token nhận:", token);
                 next();
 
             } catch (errol) {
@@ -43,4 +44,19 @@ const auth = (req, res, next) => {
 
 };
 
-module.exports = auth;
+const checkRole = (allowedRoles) => {
+    return (req, res, next) => {
+        if (!req.user || !allowedRoles.includes(req.user.role)) {
+            console.log(">>>check user role:", req.user);
+            return res.status(403).json({
+                message: "Bạn không có quyền truy cập chức năng này!"
+            });
+        }
+        next();
+    };
+};
+
+module.exports = {
+    auth,
+    checkRole
+};
