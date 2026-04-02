@@ -19,9 +19,23 @@ const loginApi = (email, password) => {
     return axios.post(URL_API, data);
 };
 
+
+//Admin API
+
 const getUserApi = () => {
     const URL_API = "/v1/api/users";
     return axios.get(URL_API);
+};
+
+const createUserByAdminApi = (name, email, password, role) => {
+    const URL_API = "/v1/api/create-doctor";
+    const data = {
+        name,
+        email,
+        password,
+        role
+    };
+    return axios.post(URL_API, data);
 };
 
 
@@ -30,5 +44,6 @@ const getUserApi = () => {
 export {
     createUserApi,
     loginApi,
-    getUserApi
+    getUserApi,
+    createUserByAdminApi
 };

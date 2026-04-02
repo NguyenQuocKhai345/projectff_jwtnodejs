@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const saltRounds = 10;
 
-const createDoctorService = async (name, email, password, role) => {
+const createDoctorService = async (name, email, password, role = "DOCTOR") => {
     try {
         //check email exist
         const user = await User.findOne({ email });
@@ -23,7 +23,7 @@ const createDoctorService = async (name, email, password, role) => {
             name: name,
             email: email,
             password: hashedPassword,
-            role: "DOCTOR"
+            role: role
         })
         return result;
 
