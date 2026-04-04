@@ -8,6 +8,7 @@ import Header from './components/layout/header'
 import { Outlet } from 'react-router-dom'
 import AuthContext from './components/context/auth.context'
 import { Spin } from 'antd';
+import AppFooter from './components/layout/footer'
 
 function App() {
 
@@ -66,6 +67,7 @@ function App() {
         <>
           <Header />
           <Outlet />
+          <AppFooter />
         </>
       }
     </div>
