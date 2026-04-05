@@ -1,8 +1,8 @@
 const express = require('express');
-const { createUser, handleLogin, getUser, getAccount } = require('../controllers/userController');
+const { createUser, handleLogin, getDoctors, getAccount, createAppointment } = require('../controllers/userController');
 const delay = require('../middleware/delay');
 const { auth, checkRole } = require('../middleware/auth');
-const { createDoctor, deleteUser, } = require('../controllers/adminController.js');
+const { createDoctor, deleteUser, getUser } = require('../controllers/adminController.js');
 
 const routerAPI = express.Router();
 
@@ -26,14 +26,20 @@ routerAPI.get('/', (req, res) => {
     })
 })
 
+//patient route
 routerAPI.post("/register", createUser)
 routerAPI.post("/login", handleLogin)
+routerAPI.post("/createAppointment", checkRole(["PATIENT"]), createAppointment)
+
 
 routerAPI.get("/account", getAccount);
+routerAPI.get("/doctors", getDoctors);
 
 //admin route
 routerAPI.get("/users", checkRole(["ADMIN"]), getUser)
 routerAPI.post("/create-doctor", checkRole(["ADMIN"]), createDoctor)
 routerAPI.delete("/users/:id", checkRole(["ADMIN"]), deleteUser)
+
+
 
 module.exports = routerAPI; //export default

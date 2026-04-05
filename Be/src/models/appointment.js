@@ -11,7 +11,11 @@ const appointmentSchema = new mongoose.Schema({
         ref: 'user',
         required: true
     },
-    time: {
+    startTime: {
+        type: Date,
+        required: true
+    },
+    endTime: {
         type: Date,
         required: true
     },

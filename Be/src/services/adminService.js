@@ -33,6 +33,18 @@ const createDoctorService = async (name, email, password, role = "DOCTOR") => {
     }
 }
 
+const getUserService = async () => {
+    try {
+        let result = await User.find({}, { password: 0 });
+        return result;
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+
 const deleteUserService = async (id) => {
     try {
         let result = await User.findByIdAndDelete(id);
@@ -55,5 +67,6 @@ const deleteUserService = async (id) => {
 
 module.exports = {
     createDoctorService,
-    deleteUserService
+    deleteUserService,
+    getUserService,
 }

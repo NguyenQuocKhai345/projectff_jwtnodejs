@@ -148,6 +148,11 @@ const Header = () => {
             key: 'user',
             icon: <UsergroupAddOutlined />,
         }] : []),
+        ...(auth?.isAuthenticated && auth?.user?.role === 'PATIENT' ? [{
+            label: <Link to="/createAppointment">Đặt lịch</Link>,
+            key: 'appointment',
+            icon: <UsergroupAddOutlined />,
+        }] : []),
         {
             label: `Welcome ${auth?.user?.email ?? ""}`,
             key: 'SubMenu',

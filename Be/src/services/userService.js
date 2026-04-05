@@ -2,6 +2,7 @@ require('dotenv').config();
 const User = require("../models/user");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const appointment = require('../models/appointment');
 const saltRounds = 10;
 
 const createUserService = async (name, email, password, role) => {
@@ -82,11 +83,11 @@ const loginService = async (email, password) => {
     }
 }
 
-const getUserService = async () => {
-    try {
-        let result = await User.find({}, { password: 0 });
-        return result;
 
+const getDoctorsService = async () => {
+    try {
+        let result = await User.find({ role: 'DOCTOR' }, { password: 0 });
+        return result;
     } catch (error) {
         console.log(error);
         return null;
@@ -103,9 +104,77 @@ const getAccountService = async (email) => {
     }
 }
 
+const createAppointmentService = async (patientId, doctorId, startTime, endTime) => {
+    try {
+        const doctor = await User.findById(doctorId);
+        if (!doctor || doctor.role !== 'DOCTOR') {
+            return {
+                EC: 1,
+                EM: "Bác sĩ không tồn tại hoặc không đúng vai trò"
+            };
+        }
+
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+        const now = new Date();
+        console.log(">>> check date - Start: ", start);
+        console.log(">>> check date - End: ", end);
+        console.log(">>> check date - Now: ", now);
+
+        // Cho phép lỗi nhỏ do timezone (5 phút buffer)
+        const BUFFER_TIME = 5 * 60 * 1000;
+
+        if (start < new Date(now.getTime() - BUFFER_TIME) || end <= start) {
+            return {
+                EC: 2,
+                EM: "Thời gian không hợp lệ "
+            };
+        }
+
+        if ((end.getTime() - start.getTime()) > 2 * 60 * 60 * 1000) {
+            return {
+                EC: 4,
+                EM: "Thời gian đặt lịch tối đa là 2 giờ"
+            };
+        }
+
+        const existed = await appointment.findOne({
+            doctorId,
+            status: { $in: ['pending', 'confirmed'] },
+            startTime: { $lt: end },
+            endTime: { $gt: start }
+        });
+
+        if (existed) {
+            return {
+                EC: 3,
+                EM: "Bác sĩ đã có lịch trong khoảng thời gian này"
+            };
+        }
+
+        const result = await appointment.create({
+            patientId: patientId,
+            doctorId: doctorId,
+            startTime: start,
+            endTime: end
+        });
+        return {
+            EC: 0,
+            EM: "Đặt lịch thành công",
+            result
+        };
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+
 module.exports = {
     createUserService,
     loginService,
-    getUserService,
-    getAccountService
+    getDoctorsService,
+    getAccountService,
+    createAppointmentService
+
 }

@@ -27,6 +27,11 @@ const getUserApi = () => {
     return axios.get(URL_API);
 };
 
+const getDoctorsApi = () => {
+    const URL_API = "/v1/api/doctors";
+    return axios.get(URL_API);
+};
+
 const createUserByAdminApi = (name, email, password, role) => {
     const URL_API = "/v1/api/create-doctor";
     const data = {
@@ -44,12 +49,23 @@ const deleteUser = (id) => {
 };
 
 
-
+//Patient API
+const createAppointmentApi = (doctorId, startTime, endTime) => {
+    const URL_API = "/v1/api/createAppointment";
+    const data = {
+        doctorId,
+        startTime,
+        endTime
+    };
+    return axios.post(URL_API, data);
+};
 
 export {
     createUserApi,
     loginApi,
     getUserApi,
+    getDoctorsApi,
     createUserByAdminApi,
-    deleteUser
+    deleteUser,
+    createAppointmentApi
 };
