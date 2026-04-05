@@ -1,109 +1,3 @@
-// import { notification, Table, Button, Layout, Menu, Typography } from "antd";
-// import { useEffect, useState } from "react";
-// import { getUserApi } from "../util/api";
-
-// const { Sider, Content } = Layout;
-// const { Title } = Typography;
-
-// const UserPage = () => {
-//     const [dataSource, setDataSource] = useState([]);
-//     const [filterRole, setFilterRole] = useState('PATIENT');
-
-//     useEffect(() => {
-//         const fetchUser = async () => {
-//             const res = await getUserApi();
-//             if (!res?.message) {
-//                 setDataSource(res);
-//             } else {
-//                 notification.error({
-//                     message: "Unauthorized",
-//                     description: res.message
-//                 });
-//             }
-//         };
-//         fetchUser();
-//     }, []);
-
-//     const columns = [
-//         {
-//             title: 'ID',
-//             dataIndex: '_id',
-//         },
-//         {
-//             title: 'Name',
-//             dataIndex: 'name',
-//         },
-//         {
-//             title: 'Email',
-//             dataIndex: 'email',
-//         },
-//         {
-//             title: 'Role',
-//             dataIndex: 'role',
-//         },
-//     ];
-
-//     const filteredData = dataSource.filter(item => item.role === filterRole);
-
-//     return (
-//         <Layout style={{ minHeight: '100vh' }}>
-//             {/* SIDEBAR */}
-//             <Sider width={220} style={{ background: '#fff' }}>
-//                 <div style={{ padding: 20 }}>
-//                     <Title level={4}>Quản lý User</Title>
-//                 </div>
-
-//                 <Menu
-//                     mode="inline"
-//                     selectedKeys={[filterRole]}
-//                     onClick={(e) => setFilterRole(e.key)}
-//                     items={[
-//                         {
-//                             key: 'PATIENT',
-//                             label: 'Bệnh nhân',
-//                         },
-//                         {
-//                             key: 'DOCTOR',
-//                             label: 'Bác sĩ',
-//                         }
-//                     ]}
-//                 />
-//             </Sider>
-
-//             {/* CONTENT */}
-//             <Layout>
-//                 <Content style={{ padding: '24px 32px' }}>
-//                     <Title level={3}>
-//                         {filterRole === 'PATIENT' ? 'Danh sách bệnh nhân' : 'Danh sách bác sĩ'}
-//                     </Title>
-
-//                     <Table
-//                         bordered
-//                         dataSource={filteredData}
-//                         columns={columns}
-//                         rowKey={"_id"}
-//                         style={{
-//                             marginTop: 20,
-//                             background: '#fff',
-//                             borderRadius: 8,
-//                             padding: 10
-//                         }}
-//                         locale={{
-//                             emptyText:
-//                                 filterRole === 'PATIENT'
-//                                     ? 'Chưa có bệnh nhân nào'
-//                                     : 'Chưa có bác sĩ nào'
-//                         }}
-//                     />
-//                 </Content>
-//             </Layout>
-//         </Layout>
-//     );
-// };
-
-// export default UserPage;
-
-
 
 import {
     notification,
@@ -118,7 +12,7 @@ import {
     Select
 } from "antd";
 import { useEffect, useState } from "react";
-import { getUserApi, createUserByAdminApi } from "../util/api";
+import { getUserApi, createUserByAdminApi, deleteUser } from "../util/api";
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
@@ -177,11 +71,21 @@ const UserPage = () => {
                 </span>
             )
         },
+        {
+            title: 'Action',
+            render: (_, record) => (
+                <Button
+                    danger
+                    onClick={() => handleDelete(record._id)}
+                >
+                    Xóa
+                </Button>
+            )
+        }
     ];
 
     const filteredData = dataSource.filter(item => item.role === filterRole);
 
-    // 👉 submit form
     const onFinish = async (values) => {
         const { name, email, password, role } = values;
 
@@ -205,6 +109,32 @@ const UserPage = () => {
                 message: 'Create failed',
             });
         }
+    };
+
+    const handleDelete = (id) => {
+        Modal.confirm({
+            title: "Xác nhận xóa",
+            content: "Bạn có chắc muốn xóa user này không?",
+            okText: "Xóa",
+            okType: "danger",
+            cancelText: "Hủy",
+            onOk: async () => {
+                const res = await deleteUser(id);
+
+                if (res && res.EC === 1) {
+                    notification.error({
+                        message: "Delete failed",
+                        description: res.EM
+                    });
+                } else {
+                    notification.success({
+                        message: "Xóa thành công"
+                    });
+
+                    fetchUser();
+                }
+            }
+        });
     };
 
     return (

@@ -38,6 +38,11 @@ const createUserByAdminApi = (name, email, password, role) => {
     return axios.post(URL_API, data);
 };
 
+const deleteUser = (id) => {
+    const URL_API = `/v1/api/users/${id}`;
+    return axios.delete(URL_API);
+};
+
 
 
 
@@ -45,5 +50,6 @@ export {
     createUserApi,
     loginApi,
     getUserApi,
-    createUserByAdminApi
+    createUserByAdminApi,
+    deleteUser
 };

@@ -1,4 +1,4 @@
-const { createDoctorService } = require("../services/adminService");
+const { createDoctorService, deleteUserService } = require("../services/adminService");
 
 const createDoctor = async (req, res) => {
     console.log(">>> check req.body: ", req.body);
@@ -7,6 +7,14 @@ const createDoctor = async (req, res) => {
     return res.status(200).json(data);
 }
 
+const deleteUser = async (req, res) => {
+    console.log(">>> check req.params: ", req.params);
+    const id = req.params.id;
+    const data = await deleteUserService(id);
+    return res.status(200).json(data);
+}
+
 module.exports = {
-    createDoctor
+    createDoctor,
+    deleteUser
 };

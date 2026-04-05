@@ -33,6 +33,27 @@ const createDoctorService = async (name, email, password, role = "DOCTOR") => {
     }
 }
 
+const deleteUserService = async (id) => {
+    try {
+        let result = await User.findByIdAndDelete(id);
+        if (!result) {
+            return {
+                EC: 1,
+                EM: "User not found"
+            }
+        }
+        return {
+            EC: 0,
+            EM: "User deleted successfully"
+        }
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+
 module.exports = {
-    createDoctorService
+    createDoctorService,
+    deleteUserService
 }
