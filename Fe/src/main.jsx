@@ -14,6 +14,7 @@ import UserPage from './pages/user.jsx';
 import LoginPage from './pages/login.jsx';
 import AppointmentPage from './pages/appointment.jsx';
 import { AuthWrapper } from './components/context/auth.context.jsx'
+import SchedulePage from './pages/schedule.jsx'
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,11 @@ const router = createBrowserRouter([
       {
         path: "createAppointment",
         element: <AppointmentPage />,
+      },
+      ,
+      {
+        path: "schedule",
+        element: <SchedulePage />,
       }
     ]
   },

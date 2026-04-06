@@ -60,6 +60,11 @@ const createAppointmentApi = (doctorId, startTime, endTime) => {
     return axios.post(URL_API, data);
 };
 
+const getScheduleApi = () => {
+    const URL_API = "/v1/api/schedule";
+    return axios.get(URL_API);
+};
+
 export {
     createUserApi,
     loginApi,
@@ -67,5 +72,6 @@ export {
     getDoctorsApi,
     createUserByAdminApi,
     deleteUser,
-    createAppointmentApi
+    createAppointmentApi,
+    getScheduleApi
 };

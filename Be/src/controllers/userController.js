@@ -1,5 +1,6 @@
-const { createUserService, loginService, getDoctorsService, getAccountService, createAppointmentService } = require('../services/userService');
+const { createUserService, loginService, getDoctorsService, getAccountService, createAppointmentService, getScheduleService } = require('../services/userService');
 const User = require('../models/user');
+const { getUserService } = require('../services/adminService');
 
 const createUser = async (req, res) => {
     console.log(">>> check req.body: ", req.body)
@@ -68,12 +69,18 @@ const createAppointment = async (req, res) => {
     }
 }
 
+const getSchedule = async (req, res) => {
+    console.log(">>> Qua controller, check req.user in getSchedule: ", req.user);
+    const data = await getScheduleService(req.user);
+    return res.status(200).json(data)
+}
 
 module.exports = {
     createUser,
     handleLogin,
     getDoctors,
     getAccount,
-    createAppointment
+    createAppointment,
+    getSchedule
 
 }

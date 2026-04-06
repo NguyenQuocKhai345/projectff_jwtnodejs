@@ -138,17 +138,23 @@ const createAppointmentService = async (patientId, doctorId, startTime, endTime)
             };
         }
 
-        const existed = await appointment.findOne({
+        const doctorExisted = await appointment.findOne({
             doctorId,
             status: { $in: ['pending', 'confirmed'] },
             startTime: { $lt: end },
             endTime: { $gt: start }
         });
+        const patientExisted = await appointment.findOne({
+            patientId,
+            status: { $in: ['pending', 'confirmed'] },
+            startTime: { $lt: end },
+            endTime: { $gt: start }
+        });
 
-        if (existed) {
+        if (doctorExisted || patientExisted) {
             return {
                 EC: 3,
-                EM: "Bác sĩ đã có lịch trong khoảng thời gian này"
+                EM: "Bác sĩ hoặc bạn đã có lịch trong khoảng thời gian này"
             };
         }
 
@@ -169,12 +175,45 @@ const createAppointmentService = async (patientId, doctorId, startTime, endTime)
     }
 }
 
+const getScheduleService = async (user) => {
+    try {
+        if (!user || !user.email) {
+            return {
+                EC: 1,
+                EM: "Người dùng không hợp lệ"
+            };
+        }
+        const result = await User.findOne({ email: user.email });
+        if (!result) {
+            return {
+                EC: 2,
+                EM: "Người dùng không tồn tại"
+            };
+        }
+
+        if (user.role === 'DOCTOR') {
+            return await appointment.find({ doctorId: result._id }).populate('patientId', 'name').populate('doctorId', 'name');
+
+        } else if (user.role === 'PATIENT') {
+            return await appointment.find({ patientId: result._id }).populate('doctorId', 'name').populate('patientId', 'name');
+
+        } else {
+            return await appointment.find({}).populate('patientId', 'name').populate('doctorId', 'name');
+        }
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
 
 module.exports = {
     createUserService,
     loginService,
     getDoctorsService,
     getAccountService,
-    createAppointmentService
+    createAppointmentService,
+    getScheduleService
 
 }

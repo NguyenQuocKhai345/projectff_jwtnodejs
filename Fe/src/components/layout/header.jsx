@@ -143,6 +143,11 @@ const Header = () => {
             key: 'home',
             icon: <HomeOutlined />,
         },
+        ...(auth?.isAuthenticated ? [{
+            label: <Link to="/schedule">Lịch của tôi</Link>,
+            key: 'schedule',
+            icon: <HomeOutlined />,
+        }] : []),
         ...(auth?.isAuthenticated && auth?.user?.role === 'ADMIN' ? [{
             label: <Link to="/user">Users</Link>,
             key: 'user',
