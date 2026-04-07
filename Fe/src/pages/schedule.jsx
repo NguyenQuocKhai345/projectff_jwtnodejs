@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Table, Tag, Button, Select, Space, notification, Card, Modal, Form, Input } from 'antd';
 import dayjs from 'dayjs';
-import { cancelScheduleApi, getScheduleApi } from '../util/api';
+import { cancelScheduleApi, getScheduleApi, updateScheduleApi } from '../util/api';
 import AuthContext from '../components/context/auth.context';
 
 
@@ -12,6 +12,8 @@ const SchedulePage = () => {
     const [data, setData] = useState([]);
     const [filterStatus, setFilterStatus] = useState("ALL");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalConfirmOpen, setIsModalConfirmOpen] = useState(false);
+    const [isModalCompleteOpen, setIsModalCompleteOpen] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
 
     const { auth } = useContext(AuthContext);
@@ -43,10 +45,31 @@ const SchedulePage = () => {
                 message: "Hủy lịch thành công"
             });
             setIsModalOpen(false);
-            fetchSchedule(); // reload lại bảng
+            fetchSchedule();
         } else {
             notification.error({
-                message: "Lỗi hủy lịch",
+                message: res?.EM || "Lỗi hủy lịch",
+                description: res?.EM
+            });
+        }
+    };
+
+    const handleUpdate = async (values) => {
+        const { note } = values;
+
+        const res = await updateScheduleApi(selectedId, note);
+
+        if (res && res.EC === 0) {
+            notification.success({
+                message: "Thành công",
+                description: res?.EM
+            });
+            setIsModalConfirmOpen(false);
+            setIsModalCompleteOpen(false);
+            fetchSchedule();
+        } else {
+            notification.error({
+                message: "Lỗi cập nhật lịch",
                 description: res?.EM
             });
         }
@@ -66,30 +89,67 @@ const SchedulePage = () => {
     };
 
     const renderAction = (record) => {
-        if (auth?.user?.role === 'PATIENT' && record.status === 'pending') {
+        const role = auth?.user?.role;
+
+        if (record.status === 'pending') {
+
+            if (role === 'PATIENT') {
+                return (
+                    <Button
+                        danger
+                        onClick={() => {
+                            setSelectedId(record._id);
+                            setIsModalOpen(true);
+                        }}
+                    >
+                        Hủy
+                    </Button>
+                );
+            }
+
+            if (role === 'DOCTOR') {
+                return (
+                    <Space>
+                        <Button type="primary"
+
+                            onClick={() => {
+                                setSelectedId(record._id);
+                                setIsModalConfirmOpen(true);
+                            }}
+                        >
+                            Xác nhận
+                        </Button>
+                        <Button
+                            danger
+                            onClick={() => {
+                                setSelectedId(record._id);
+                                setIsModalOpen(true);
+                            }}
+                        >
+                            Hủy
+                        </Button>
+                    </Space>
+                );
+            }
+        }
+        //debugger;
+        if (role === 'DOCTOR' && record.status === 'confirmed') {
             return (
-                <Button
-                    danger
+                <Button type="primary"
+
                     onClick={() => {
                         setSelectedId(record._id);
-                        setIsModalOpen(true);
+                        setIsModalCompleteOpen(true);
                     }}
                 >
-                    Hủy
-                </Button>
-            );
-        }
-
-        if (auth?.user?.role === 'DOCTOR' && record.status === 'pending') {
-            return (
-                <Button type="primary">
-                    Xác nhận
+                    Hoàn thành
                 </Button>
             );
         }
 
         return null;
     };
+
 
     const filteredData = filterStatus === "ALL"
         ? data
@@ -171,6 +231,62 @@ const SchedulePage = () => {
                                 </Button>
                                 <Button type="primary" danger htmlType="submit">
                                     Xác nhận hủy
+                                </Button>
+                            </Space>
+                        </Form.Item>
+                    </Form>
+                </Modal>
+
+                <Modal
+                    title="Xác nhận nhận lịch"
+                    open={isModalConfirmOpen}
+                    onCancel={() => setIsModalConfirmOpen(false)}
+                    footer={null}
+                >
+                    <Form onFinish={handleUpdate}>
+                        {/* <Form.Item
+                            label="Lý do hủy"
+                            name="note"
+                            rules={[{ required: true, message: 'Vui lòng nhập lý do' }]}
+                        >
+                            <Input.TextArea rows={3} placeholder="Nhập lý do..." />
+                        </Form.Item> */}
+
+                        <Form.Item>
+                            <Space>
+                                <Button onClick={() => setIsModalConfirmOpen(false)}>
+                                    Hủy bỏ
+                                </Button>
+                                <Button type="primary" htmlType="submit">
+                                    Xác nhận nhận lịch
+                                </Button>
+                            </Space>
+                        </Form.Item>
+                    </Form>
+                </Modal>
+
+                <Modal
+                    title="Xác nhận hoàn thành buổi khám"
+                    open={isModalCompleteOpen}
+                    onCancel={() => setIsModalCompleteOpen(false)}
+                    footer={null}
+                >
+                    <Form onFinish={handleUpdate}>
+                        <Form.Item
+                            label="Nhận xét sau khi khám"
+                            name="note"
+                            rules={[{ required: true, message: 'Vui lòng nhập nhận xét' }]}
+                        >
+                            <Input.TextArea rows={3} placeholder="Nhập nhận xét..." />
+                        </Form.Item>
+
+                        <Form.Item>
+                            <Space>
+                                <Button onClick={() => setIsModalCompleteOpen(false)}>
+                                    Hủy bỏ
+                                </Button>
+                                <Button type="primary" htmlType="submit">
+                                    Xác nhận hoàn thành buổi khám
                                 </Button>
                             </Space>
                         </Form.Item>

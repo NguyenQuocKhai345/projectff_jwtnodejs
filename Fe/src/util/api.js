@@ -69,6 +69,10 @@ const cancelScheduleApi = (id, note) => {
     return axios.patch(`/v1/api/schedule/${id}/cancel`, { note });
 };
 
+//Doctor API
+const updateScheduleApi = (id, note) => {
+    return axios.patch(`/v1/api/schedule/${id}/update`, { note });
+};
 
 export {
     createUserApi,
@@ -79,5 +83,6 @@ export {
     deleteUser,
     createAppointmentApi,
     getScheduleApi,
-    cancelScheduleApi
+    cancelScheduleApi,
+    updateScheduleApi
 };

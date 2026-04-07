@@ -3,6 +3,7 @@ const { createUser, handleLogin, getDoctors, getAccount, createAppointment, getS
 const delay = require('../middleware/delay');
 const { auth, checkRole } = require('../middleware/auth');
 const { createDoctor, deleteUser, getUser } = require('../controllers/adminController.js');
+const { updateSchedule } = require('../controllers/doctorController.js');
 
 const routerAPI = express.Router();
 
@@ -31,7 +32,7 @@ routerAPI.post("/register", createUser)
 routerAPI.post("/login", handleLogin)
 routerAPI.post("/createAppointment", checkRole(["PATIENT"]), createAppointment)
 routerAPI.get("/schedule", getSchedule);
-routerAPI.patch("/schedule/:id/cancel", checkRole(["PATIENT"]), cancelSchedule);
+routerAPI.patch("/schedule/:id/cancel", checkRole(["PATIENT", "DOCTOR"]), cancelSchedule);
 
 
 routerAPI.get("/account", getAccount);
@@ -42,6 +43,7 @@ routerAPI.get("/users", checkRole(["ADMIN"]), getUser)
 routerAPI.post("/create-doctor", checkRole(["ADMIN"]), createDoctor)
 routerAPI.delete("/users/:id", checkRole(["ADMIN"]), deleteUser)
 
-
+//doctor route
+routerAPI.patch("/schedule/:id/update", checkRole(["DOCTOR"]), updateSchedule);
 
 module.exports = routerAPI; //export default

@@ -1,6 +1,5 @@
 const { createUserService, loginService, getDoctorsService, getAccountService, createAppointmentService, getScheduleService, cancelScheduleService } = require('../services/userService');
 const User = require('../models/user');
-const { getUserService } = require('../services/adminService');
 
 const createUser = async (req, res) => {
     console.log(">>> check req.body: ", req.body)
