@@ -1,5 +1,5 @@
 const express = require('express');
-const { createUser, handleLogin, getDoctors, getAccount, createAppointment, getSchedule } = require('../controllers/userController');
+const { createUser, handleLogin, getDoctors, getAccount, createAppointment, getSchedule, cancelSchedule } = require('../controllers/userController');
 const delay = require('../middleware/delay');
 const { auth, checkRole } = require('../middleware/auth');
 const { createDoctor, deleteUser, getUser } = require('../controllers/adminController.js');
@@ -31,6 +31,7 @@ routerAPI.post("/register", createUser)
 routerAPI.post("/login", handleLogin)
 routerAPI.post("/createAppointment", checkRole(["PATIENT"]), createAppointment)
 routerAPI.get("/schedule", getSchedule);
+routerAPI.patch("/schedule/:id/cancel", checkRole(["PATIENT"]), cancelSchedule);
 
 
 routerAPI.get("/account", getAccount);

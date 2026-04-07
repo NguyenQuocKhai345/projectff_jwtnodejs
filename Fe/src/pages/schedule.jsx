@@ -1,14 +1,18 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Table, Tag, Button, Select, Space, notification, Card } from 'antd';
+import { Table, Tag, Button, Select, Space, notification, Card, Modal, Form, Input } from 'antd';
 import dayjs from 'dayjs';
-import { getScheduleApi } from '../util/api';
+import { cancelScheduleApi, getScheduleApi } from '../util/api';
 import AuthContext from '../components/context/auth.context';
+
+
 
 const { Option } = Select;
 
 const SchedulePage = () => {
     const [data, setData] = useState([]);
     const [filterStatus, setFilterStatus] = useState("ALL");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedId, setSelectedId] = useState(null);
 
     const { auth } = useContext(AuthContext);
 
@@ -29,6 +33,27 @@ const SchedulePage = () => {
         }
     };
 
+    const handleCancel = async (values) => {
+        const { note } = values;
+
+        const res = await cancelScheduleApi(selectedId, note);
+
+        if (res && res.EC === 0) {
+            notification.success({
+                message: "Hủy lịch thành công"
+            });
+            setIsModalOpen(false);
+            fetchSchedule(); // reload lại bảng
+        } else {
+            notification.error({
+                message: "Lỗi hủy lịch",
+                description: res?.EM
+            });
+        }
+    };
+
+
+
     const renderStatus = (status) => {
         const colorMap = {
             pending: 'orange',
@@ -43,7 +68,13 @@ const SchedulePage = () => {
     const renderAction = (record) => {
         if (auth?.user?.role === 'PATIENT' && record.status === 'pending') {
             return (
-                <Button danger>
+                <Button
+                    danger
+                    onClick={() => {
+                        setSelectedId(record._id);
+                        setIsModalOpen(true);
+                    }}
+                >
                     Hủy
                 </Button>
             );
@@ -97,7 +128,6 @@ const SchedulePage = () => {
         <div style={{ maxWidth: 1100, margin: '40px auto' }}>
             <Card title="Lịch khám của bạn" style={{ borderRadius: 10 }}>
 
-                {/* FILTER */}
                 <Space style={{ marginBottom: 20 }}>
                     <span>Lọc trạng thái:</span>
                     <Select
@@ -113,13 +143,40 @@ const SchedulePage = () => {
                     </Select>
                 </Space>
 
-                {/* TABLE */}
                 <Table
                     dataSource={filteredData}
                     columns={columns}
                     rowKey="_id"
                     bordered
                 />
+                <Modal
+                    title="Xác nhận hủy lịch"
+                    open={isModalOpen}
+                    onCancel={() => setIsModalOpen(false)}
+                    footer={null}
+                >
+                    <Form onFinish={handleCancel}>
+                        <Form.Item
+                            label="Lý do hủy"
+                            name="note"
+                            rules={[{ required: true, message: 'Vui lòng nhập lý do' }]}
+                        >
+                            <Input.TextArea rows={3} placeholder="Nhập lý do..." />
+                        </Form.Item>
+
+                        <Form.Item>
+                            <Space>
+                                <Button onClick={() => setIsModalOpen(false)}>
+                                    Hủy bỏ
+                                </Button>
+                                <Button type="primary" danger htmlType="submit">
+                                    Xác nhận hủy
+                                </Button>
+                            </Space>
+                        </Form.Item>
+                    </Form>
+                </Modal>
+
             </Card>
         </div>
     );

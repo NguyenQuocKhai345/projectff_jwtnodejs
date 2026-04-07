@@ -207,6 +207,33 @@ const getScheduleService = async (user) => {
     }
 }
 
+const cancelScheduleService = async (id, note) => {
+    try {
+        let result = await appointment.findOne({ _id: id });
+        if (!result) {
+            return {
+                EC: 1,
+                EM: "Appointment not found"
+            }
+        }
+        if (result.status != 'pending') {
+            return {
+                EC: 2,
+                EM: "Không thể hủy lịch này"
+            }
+        }
+        result.status = 'cancelled';
+        result.note = note;
+        await result.save();
+        return {
+            EC: 0,
+            EM: "Appointment cancelled successfully"
+        }
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
 
 module.exports = {
     createUserService,
@@ -214,6 +241,7 @@ module.exports = {
     getDoctorsService,
     getAccountService,
     createAppointmentService,
-    getScheduleService
+    getScheduleService,
+    cancelScheduleService
 
 }

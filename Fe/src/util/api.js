@@ -65,6 +65,11 @@ const getScheduleApi = () => {
     return axios.get(URL_API);
 };
 
+const cancelScheduleApi = (id, note) => {
+    return axios.patch(`/v1/api/schedule/${id}/cancel`, { note });
+};
+
+
 export {
     createUserApi,
     loginApi,
@@ -73,5 +78,6 @@ export {
     createUserByAdminApi,
     deleteUser,
     createAppointmentApi,
-    getScheduleApi
+    getScheduleApi,
+    cancelScheduleApi
 };
