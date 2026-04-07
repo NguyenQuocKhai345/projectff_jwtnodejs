@@ -3,6 +3,7 @@ import { Table, Tag, Button, Select, Space, notification, Card, Modal, Form, Inp
 import dayjs from 'dayjs';
 import { cancelScheduleApi, getScheduleApi, updateScheduleApi } from '../util/api';
 import AuthContext from '../components/context/auth.context';
+import { DatePicker } from 'antd';
 
 
 
@@ -15,6 +16,10 @@ const SchedulePage = () => {
     const [isModalConfirmOpen, setIsModalConfirmOpen] = useState(false);
     const [isModalCompleteOpen, setIsModalCompleteOpen] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
+    const [filterDoctor, setFilterDoctor] = useState(null);
+    const [filterPatient, setFilterPatient] = useState(null);
+    const [filterDate, setFilterDate] = useState(null);
+
 
     const { auth } = useContext(AuthContext);
 
@@ -151,9 +156,22 @@ const SchedulePage = () => {
     };
 
 
-    const filteredData = filterStatus === "ALL"
-        ? data
-        : data.filter(item => item.status === filterStatus);
+    const filteredData = data.filter(item => {
+
+        if (filterStatus !== "ALL" && item.status !== filterStatus) return false;
+
+        if (filterDate) {
+            const itemDate = dayjs(item.startTime).format("YYYY-MM-DD");
+            const selectedDate = dayjs(filterDate).format("YYYY-MM-DD");
+            if (itemDate !== selectedDate) return false;
+        }
+
+        if (filterDoctor && item.doctorId?._id !== filterDoctor) return false;
+
+        if (filterPatient && item.patientId?._id !== filterPatient) return false;
+
+        return true;
+    });
 
     const columns = [
         {
@@ -188,12 +206,13 @@ const SchedulePage = () => {
         <div style={{ maxWidth: 1100, margin: '40px auto' }}>
             <Card title="Lịch khám của bạn" style={{ borderRadius: 10 }}>
 
-                <Space style={{ marginBottom: 20 }}>
-                    <span>Lọc trạng thái:</span>
+                <Space style={{ marginBottom: 20 }} wrap>
+
+                    {/* STATUS */}
                     <Select
                         value={filterStatus}
                         onChange={setFilterStatus}
-                        style={{ width: 200 }}
+                        style={{ width: 150 }}
                     >
                         <Option value="ALL">Tất cả</Option>
                         <Option value="pending">Pending</Option>
@@ -201,6 +220,58 @@ const SchedulePage = () => {
                         <Option value="cancelled">Cancelled</Option>
                         <Option value="completed">Completed</Option>
                     </Select>
+
+                    <DatePicker
+                        value={filterDate}
+                        placeholder="Chọn ngày"
+                        onChange={(date) => setFilterDate(date)}
+                    />
+
+                    {auth?.user?.role === 'ADMIN' && (
+                        <>
+                            <Select
+                                value={filterDoctor}
+                                placeholder="Chọn bác sĩ"
+                                allowClear
+                                style={{ width: 180 }}
+                                onChange={setFilterDoctor}
+                            >
+                                {data.map(item => item.doctorId).filter((v, i, a) =>
+                                    a.findIndex(t => t._id === v._id) === i
+                                ).map(doc => (
+                                    <Option key={doc._id} value={doc._id}>
+                                        {doc.name}
+                                    </Option>
+                                ))}
+                            </Select>
+
+                            <Select
+                                value={filterPatient}
+                                placeholder="Chọn bệnh nhân"
+                                allowClear
+                                style={{ width: 180 }}
+                                onChange={setFilterPatient}
+                            >
+                                {data.map(item => item.patientId).filter((v, i, a) =>
+                                    a.findIndex(t => t._id === v._id) === i
+                                ).map(p => (
+                                    <Option key={p._id} value={p._id}>
+                                        {p.name}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </>
+                    )}
+                    <Button onClick={() => {
+                        setFilterStatus("ALL");
+                        setFilterDate(null);
+                        setFilterDoctor(null);
+                        setFilterPatient(null);
+                    }}>
+                        Reset
+                    </Button>
+
+
                 </Space>
 
                 <Table

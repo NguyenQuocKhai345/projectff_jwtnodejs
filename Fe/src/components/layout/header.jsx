@@ -108,7 +108,12 @@ import React, { useContext, useState } from 'react';
 import {
     SettingOutlined,
     HomeOutlined,
-    UsergroupAddOutlined
+    UsergroupAddOutlined,
+    ScheduleOutlined,
+    FileAddOutlined,
+    UserAddOutlined,
+    LoginOutlined,
+    LogoutOutlined
 } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
@@ -146,7 +151,7 @@ const Header = () => {
         ...(auth?.isAuthenticated ? [{
             label: <Link to="/schedule">Lịch của tôi</Link>,
             key: 'schedule',
-            icon: <HomeOutlined />,
+            icon: <ScheduleOutlined />,
         }] : []),
         ...(auth?.isAuthenticated && auth?.user?.role === 'ADMIN' ? [{
             label: <Link to="/user">Users</Link>,
@@ -156,7 +161,7 @@ const Header = () => {
         ...(auth?.isAuthenticated && auth?.user?.role === 'PATIENT' ? [{
             label: <Link to="/createAppointment">Đặt lịch</Link>,
             key: 'appointment',
-            icon: <UsergroupAddOutlined />,
+            icon: <FileAddOutlined />,
         }] : []),
         {
             label: `Welcome ${auth?.user?.email ?? ""}`,
@@ -167,15 +172,18 @@ const Header = () => {
                     {
                         label: 'Đăng Xuất',
                         key: 'logout',
+                        icon: <LoginOutlined />
                     },
                 ] : [
                     {
                         label: <Link to="/login">Đăng Nhập</Link>,
                         key: 'login',
+                        icon: <LogoutOutlined />
                     },
                     {
                         label: <Link to="/register">Đăng Ký</Link>,
                         key: 'register',
+                        icon: <UserAddOutlined />
                     },
                 ]),
             ],
