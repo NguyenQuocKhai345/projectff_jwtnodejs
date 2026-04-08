@@ -24,7 +24,12 @@ const appointmentSchema = new mongoose.Schema({
         enum: ['pending', 'confirmed', 'cancelled', 'completed'],
         default: 'pending'
     },
-    note: { type: String }
+    note: { type: String },
+    medicalRecordId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'medicalRecord',
+        default: null
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('appointment', appointmentSchema);

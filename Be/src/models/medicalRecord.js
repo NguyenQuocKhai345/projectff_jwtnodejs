@@ -14,10 +14,10 @@ const medicalRecordSchema = new mongoose.Schema({
     appointmentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'appointment',
-        unique: true // Mỗi lịch khám chỉ có 1 hồ sơ duy nhất
+        unique: true
     },
     diagnosis: { type: String, required: true },
     prescription: { type: String }, // Đơn thuốc
 }, { timestamps: true });
 
-module.exports = mongoose.model('medical_record', medicalRecordSchema);
+module.exports = mongoose.model('medicalRecord', medicalRecordSchema);

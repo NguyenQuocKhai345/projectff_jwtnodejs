@@ -104,7 +104,7 @@ const getAccountService = async (email) => {
     }
 }
 
-const createAppointmentService = async (patientId, doctorId, startTime, endTime) => {
+const createAppointmentService = async (email, doctorId, startTime, endTime) => {
     try {
         const doctor = await User.findById(doctorId);
         if (!doctor || doctor.role !== 'DOCTOR') {
@@ -113,6 +113,14 @@ const createAppointmentService = async (patientId, doctorId, startTime, endTime)
                 EM: "Bác sĩ không tồn tại hoặc không đúng vai trò"
             };
         }
+        const patient = await User.findOne({ email: email });
+        if (!patient || patient.role !== 'PATIENT') {
+            return {
+                EC: 2,
+                EM: "Bệnh nhân không tồn tại hoặc không đúng vai trò"
+            };
+        }
+
 
         const start = new Date(startTime);
         const end = new Date(endTime);
@@ -145,7 +153,7 @@ const createAppointmentService = async (patientId, doctorId, startTime, endTime)
             endTime: { $gt: start }
         });
         const patientExisted = await appointment.findOne({
-            patientId,
+            patientId: patient._id,
             status: { $in: ['pending', 'confirmed'] },
             startTime: { $lt: end },
             endTime: { $gt: start }
@@ -157,13 +165,15 @@ const createAppointmentService = async (patientId, doctorId, startTime, endTime)
                 EM: "Bác sĩ hoặc bạn đã có lịch trong khoảng thời gian này"
             };
         }
+        console.log(">>> check appointment created: ", patient, "-", patient._id);
 
         const result = await appointment.create({
-            patientId: patientId,
+            patientId: patient._id,
             doctorId: doctorId,
             startTime: start,
             endTime: end
         });
+        console.log(">>> check appointment created: ", result);
         return {
             EC: 0,
             EM: "Đặt lịch thành công",

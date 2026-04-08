@@ -34,39 +34,12 @@ const getAccount = async (req, res) => {
 }
 
 const createAppointment = async (req, res) => {
-    try {
-        console.log(">>> check req.user: ", req.user);
-        console.log(">>> check req.body: ", req.body);
-
-        if (!req.user || !req.user.email) {
-            return res.status(401).json({
-                EC: 1,
-                EM: "Token không hợp lệ"
-            });
-        }
-
-        const { doctorId, startTime, endTime } = req.body;
-
-        const patient = await User.findOne({ email: req.user.email });
-        console.log(">>> patient found: ", patient);
-
-        if (!patient) {
-            return res.status(404).json({
-                EC: 1,
-                EM: "Không tìm thấy bệnh nhân"
-            });
-        }
-
-        const data = await createAppointmentService(patient._id, doctorId, startTime, endTime);
-        return res.status(200).json(data)
-    } catch (error) {
-        console.error(">>> Create appointment error: ", error);
-        return res.status(500).json({
-            EC: 1,
-            EM: "Lỗi server khi đặt lịch"
-        });
-    }
+    const { doctorId, startTime, endTime } = req.body;
+    const email = req.user.email;
+    const data = await createAppointmentService(email, doctorId, startTime, endTime);
+    return res.status(200).json(data);
 }
+
 
 const getSchedule = async (req, res) => {
     console.log(">>> Qua controller, check req.user in getSchedule: ", req.user);

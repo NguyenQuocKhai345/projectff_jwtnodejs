@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Table, Tag, Button, Select, Space, notification, Card, Modal, Form, Input } from 'antd';
 import dayjs from 'dayjs';
-import { cancelScheduleApi, getScheduleApi, updateScheduleApi } from '../util/api';
+import { cancelScheduleApi, createMedicalRecordApi, getScheduleApi, updateScheduleApi } from '../util/api';
 import AuthContext from '../components/context/auth.context';
 import { DatePicker } from 'antd';
 
@@ -14,11 +14,13 @@ const SchedulePage = () => {
     const [filterStatus, setFilterStatus] = useState("ALL");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalConfirmOpen, setIsModalConfirmOpen] = useState(false);
+    const [isModalRecordOpen, setIsModalRecordOpen] = useState(false);
     const [isModalCompleteOpen, setIsModalCompleteOpen] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [filterDoctor, setFilterDoctor] = useState(null);
     const [filterPatient, setFilterPatient] = useState(null);
     const [filterDate, setFilterDate] = useState(null);
+
 
 
     const { auth } = useContext(AuthContext);
@@ -58,6 +60,34 @@ const SchedulePage = () => {
             });
         }
     };
+
+    const [formRecord] = Form.useForm();
+
+    const handleCreateMedicalRecord = async (values) => {
+        const { diagnosis, prescription } = values;
+
+        const res = await createMedicalRecordApi(
+            selectedId,
+            diagnosis,
+            prescription
+        );
+
+        if (res && res.EC === 0) {
+            notification.success({
+                message: "Tạo hồ sơ y tế thành công"
+            });
+
+            setIsModalRecordOpen(false);
+            formRecord.resetFields();
+            fetchSchedule();
+        } else {
+            notification.error({
+                message: res?.EM || "Lỗi tạo hồ sơ y tế",
+                description: res?.EM
+            });
+        }
+    };
+
 
     const handleUpdate = async (values) => {
         const { note } = values;
@@ -148,6 +178,19 @@ const SchedulePage = () => {
                     }}
                 >
                     Hoàn thành
+                </Button>
+            );
+        }
+        if (role === 'DOCTOR' && record.status === 'completed' && !record.medicalRecordId) {
+            return (
+                <Button type="primary"
+
+                    onClick={() => {
+                        setSelectedId(record._id);
+                        setIsModalRecordOpen(true);
+                    }}
+                >
+                    Tạo hồ sơ y tế
                 </Button>
             );
         }
@@ -315,14 +358,6 @@ const SchedulePage = () => {
                     footer={null}
                 >
                     <Form onFinish={handleUpdate}>
-                        {/* <Form.Item
-                            label="Lý do hủy"
-                            name="note"
-                            rules={[{ required: true, message: 'Vui lòng nhập lý do' }]}
-                        >
-                            <Input.TextArea rows={3} placeholder="Nhập lý do..." />
-                        </Form.Item> */}
-
                         <Form.Item>
                             <Space>
                                 <Button onClick={() => setIsModalConfirmOpen(false)}>
@@ -358,6 +393,42 @@ const SchedulePage = () => {
                                 </Button>
                                 <Button type="primary" htmlType="submit">
                                     Xác nhận hoàn thành buổi khám
+                                </Button>
+                            </Space>
+                        </Form.Item>
+                    </Form>
+                </Modal>
+
+                <Modal
+                    title="Tạo hồ sơ y tế"
+                    open={isModalRecordOpen}
+                    onCancel={() => setIsModalRecordOpen(false)}
+                    footer={null}
+                >
+                    <Form form={formRecord} onFinish={handleCreateMedicalRecord}>
+                        <Form.Item
+                            label="Chẩn đoán"
+                            name="diagnosis"
+                            rules={[{ required: true, message: 'Vui lòng nhập chẩn đoán' }]}
+                        >
+                            <Input.TextArea rows={3} placeholder="Nhập chẩn đoán..." />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Đơn thuốc"
+                            name="prescription"
+                            rules={[{ required: true, message: 'Vui lòng nhập đơn thuốc' }]}
+                        >
+                            <Input.TextArea rows={3} placeholder="Nhập đơn thuốc..." />
+                        </Form.Item>
+
+                        <Form.Item>
+                            <Space>
+                                <Button onClick={() => setIsModalRecordOpen(false)}>
+                                    Hủy bỏ
+                                </Button>
+                                <Button type="primary" htmlType="submit">
+                                    Tạo hồ sơ y tế
                                 </Button>
                             </Space>
                         </Form.Item>

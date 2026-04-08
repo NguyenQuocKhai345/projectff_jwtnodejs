@@ -33,7 +33,7 @@ const getDoctorsApi = () => {
 };
 
 const createUserByAdminApi = (name, email, password, role) => {
-    const URL_API = "/v1/api/create-doctor";
+    const URL_API = "/v1/api/createUserByAdmin";
     const data = {
         name,
         email,
@@ -74,6 +74,15 @@ const updateScheduleApi = (id, note) => {
     return axios.patch(`/v1/api/schedule/${id}/update`, { note });
 };
 
+const createMedicalRecordApi = (id, diagnosis, prescription) => {
+    const URL_API = `/v1/api/medicalRecord/${id}`;
+    const data = {
+        diagnosis,
+        prescription
+    }
+    return axios.post(URL_API, data);
+}
+
 export {
     createUserApi,
     loginApi,
@@ -84,5 +93,6 @@ export {
     createAppointmentApi,
     getScheduleApi,
     cancelScheduleApi,
-    updateScheduleApi
+    updateScheduleApi,
+    createMedicalRecordApi
 };

@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const saltRounds = 10;
 
-const createDoctorService = async (name, email, password, role = "DOCTOR") => {
+const createUserByAdminService = async (name, email, password, role = "DOCTOR") => {
     try {
         //check email exist
         const user = await User.findOne({ email });
@@ -66,7 +66,7 @@ const deleteUserService = async (id) => {
 
 
 module.exports = {
-    createDoctorService,
+    createUserByAdminService,
     deleteUserService,
     getUserService,
 }

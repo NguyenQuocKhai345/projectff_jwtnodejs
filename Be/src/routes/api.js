@@ -2,8 +2,8 @@ const express = require('express');
 const { createUser, handleLogin, getDoctors, getAccount, createAppointment, getSchedule, cancelSchedule } = require('../controllers/userController');
 const delay = require('../middleware/delay');
 const { auth, checkRole } = require('../middleware/auth');
-const { createDoctor, deleteUser, getUser } = require('../controllers/adminController.js');
-const { updateSchedule } = require('../controllers/doctorController.js');
+const { createUserByAdmin, deleteUser, getUser } = require('../controllers/adminController.js');
+const { updateSchedule, createMedicalRecord } = require('../controllers/doctorController.js');
 
 const routerAPI = express.Router();
 
@@ -40,10 +40,12 @@ routerAPI.get("/doctors", getDoctors);
 
 //admin route
 routerAPI.get("/users", checkRole(["ADMIN"]), getUser)
-routerAPI.post("/create-doctor", checkRole(["ADMIN"]), createDoctor)
+routerAPI.post("/createUserByAdmin", checkRole(["ADMIN"]), createUserByAdmin)
 routerAPI.delete("/users/:id", checkRole(["ADMIN"]), deleteUser)
 
 //doctor route
 routerAPI.patch("/schedule/:id/update", checkRole(["DOCTOR"]), updateSchedule);
+//routerAPI.get("/medicalRecord", checkRole(["DOCTOR"]), getMedicalReport);
+routerAPI.post("/medicalRecord/:id", checkRole(["DOCTOR"]), createMedicalRecord);
 
 module.exports = routerAPI; //export default
