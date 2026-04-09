@@ -214,6 +214,14 @@ const SchedulePage = () => {
                 </Button>
             );
         }
+        if (role !== 'DOCTOR' && record.status === 'completed' && !record.medicalRecordId) {
+            return (
+                <div>
+                    Chưa có hồ sơ y tế
+                </div>
+
+            );
+        }
 
         return null;
     };
