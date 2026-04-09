@@ -83,6 +83,11 @@ const createMedicalRecordApi = (id, diagnosis, prescription) => {
     return axios.post(URL_API, data);
 }
 
+const getMedicalRecordApi = (id) => {
+    const URL_API = `/v1/api/getMedicalRecord/${id}`;
+    return axios.get(URL_API);
+}
+
 export {
     createUserApi,
     loginApi,
@@ -94,5 +99,7 @@ export {
     getScheduleApi,
     cancelScheduleApi,
     updateScheduleApi,
-    createMedicalRecordApi
+    createMedicalRecordApi,
+    getMedicalRecordApi
+
 };

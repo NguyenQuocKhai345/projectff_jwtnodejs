@@ -3,6 +3,7 @@ const User = require("../models/user");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const appointment = require('../models/appointment');
+const medicalRecord = require('../models/medicalRecord');
 const saltRounds = 10;
 
 const createUserService = async (name, email, password, role) => {
@@ -245,6 +246,41 @@ const cancelScheduleService = async (id, note) => {
     }
 }
 
+const getMedicalReportService = async (id) => {
+    try {
+        const result = await appointment.findById(id);
+        if (!result) {
+            return {
+                EC: 1,
+                EM: "Lịch khám không tồn tại"
+            };
+        }
+        if (result.status !== 'completed' || !result.medicalRecordId) {
+            return {
+                EC: 2,
+                EM: "Chỉ có thể xem hồ sơ y tế của lịch khám đã hoàn thành hoặc chưa có hồ sơ y tế"
+            };
+        }
+        const record = await medicalRecord.findById(result.medicalRecordId).populate('patientId', 'name').populate('doctorId', 'name');
+        if (!record) {
+            return {
+                EC: 3,
+                EM: "Hồ sơ y tế không tồn tại"
+            };
+        }
+        return {
+            EC: 0,
+            EM: "Lấy hồ sơ y tế thành công",
+            record
+        };
+
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
 module.exports = {
     createUserService,
     loginService,
@@ -252,6 +288,7 @@ module.exports = {
     getAccountService,
     createAppointmentService,
     getScheduleService,
-    cancelScheduleService
+    cancelScheduleService,
+    getMedicalReportService
 
 }

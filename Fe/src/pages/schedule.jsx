@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { cancelScheduleApi, createMedicalRecordApi, getScheduleApi, updateScheduleApi } from '../util/api';
 import AuthContext from '../components/context/auth.context';
 import { DatePicker } from 'antd';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 
 
@@ -20,6 +21,9 @@ const SchedulePage = () => {
     const [filterDoctor, setFilterDoctor] = useState(null);
     const [filterPatient, setFilterPatient] = useState(null);
     const [filterDate, setFilterDate] = useState(null);
+
+    const navigate = useNavigate();
+
 
 
 
@@ -110,6 +114,10 @@ const SchedulePage = () => {
         }
     };
 
+    const handleGetRecord = (id) => {
+        navigate(`/getMedicalRecord/${id}`);
+    };
+
 
 
     const renderStatus = (status) => {
@@ -191,6 +199,18 @@ const SchedulePage = () => {
                     }}
                 >
                     Tạo hồ sơ y tế
+                </Button>
+            );
+        }
+        if (record.status === 'completed' && record.medicalRecordId) {
+            return (
+                <Button type="primary"
+
+                    onClick={() => {
+                        handleGetRecord(record._id);
+                    }}
+                >
+                    Xem hồ sơ y tế
                 </Button>
             );
         }
