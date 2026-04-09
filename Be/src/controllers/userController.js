@@ -1,4 +1,4 @@
-const { createUserService, loginService, getDoctorsService, getAccountService, createAppointmentService, getScheduleService, cancelScheduleService, getMedicalReportService } = require('../services/userService');
+const { createUserService, loginService, getDoctorsService, getAccountService, createAppointmentService, getScheduleService, cancelScheduleService, getMedicalReportService, verifyEmailService } = require('../services/userService');
 const User = require('../models/user');
 
 const createUser = async (req, res) => {
@@ -62,6 +62,12 @@ const getMedicalReport = async (req, res) => {
     return res.status(200).json(data)
 }
 
+const verifyEmail = async (req, res) => {
+    console.log(">>> check query:", req.query);
+    const { token } = req.query;
+    const data = await verifyEmailService(token);
+    return res.status(200).json(data)
+}
 
 module.exports = {
     createUser,
@@ -71,6 +77,7 @@ module.exports = {
     createAppointment,
     getSchedule,
     cancelSchedule,
-    getMedicalReport
+    getMedicalReport,
+    verifyEmail
 
 }

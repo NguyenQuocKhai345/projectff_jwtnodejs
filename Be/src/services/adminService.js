@@ -6,6 +6,20 @@ const saltRounds = 10;
 
 const createUserByAdminService = async (name, email, password, role = "DOCTOR") => {
     try {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return {
+                EC: 1,
+                EM: "Định dạng email không hợp lệ (ví dụ: abc@gmail.com)"
+            };
+        }
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            return {
+                EC: 1,
+                EM: "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+            };
+        }
         //check email exist
         const user = await User.findOne({ email });
         if (user) {
@@ -23,7 +37,8 @@ const createUserByAdminService = async (name, email, password, role = "DOCTOR") 
             name: name,
             email: email,
             password: hashedPassword,
-            role: role
+            role: role,
+            isVerified: true
         })
         return result;
 

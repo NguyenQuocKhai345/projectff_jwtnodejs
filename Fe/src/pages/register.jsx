@@ -23,11 +23,11 @@ const RegisterPage = () => {
 
         else if (res) {
             notification.success({
-                message: 'Register successfully',
-                description: "Success"
+                message: 'Vui lòng xác thực',
+                description: res.EM
             });
 
-            navigate('/login');
+            //navigate('/login');
         } else {
             notification.error({
                 message: 'Register failed',

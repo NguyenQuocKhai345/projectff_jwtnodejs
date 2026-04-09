@@ -16,6 +16,7 @@ import AppointmentPage from './pages/appointment.jsx';
 import { AuthWrapper } from './components/context/auth.context.jsx'
 import SchedulePage from './pages/schedule.jsx'
 import MedicalRecordPage from './pages/medicalRecordPage.jsx'
+import VerifyPage from './pages/verify.jsx'
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: "getMedicalRecord/:id",
         element: <MedicalRecordPage />,
+      },
+      {
+        path: "/verify",
+        element: <VerifyPage />,
       }
     ]
   },

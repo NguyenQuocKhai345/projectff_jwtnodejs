@@ -5,7 +5,7 @@ const apiRoutes = require('./routes/api');
 const connection = require('./config/database');
 const { getHomepage } = require('./controllers/homeController');
 const cors = require('cors');
-const seedAdmin = require('./config/seed');
+const seedDatabase = require('./config/seed');
 
 
 const app = express();
@@ -30,7 +30,7 @@ app.use('/v1/api/', apiRoutes);
         //using mongoose
         await connection();
 
-        await seedAdmin();
+        await seedDatabase();
 
         app.listen(port, () => {
             console.log(`Backend Nodejs App listening on port ${port}`)

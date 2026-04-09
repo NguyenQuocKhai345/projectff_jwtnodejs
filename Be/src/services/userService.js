@@ -1,13 +1,31 @@
 require('dotenv').config();
 const User = require("../models/user");
+const { sendVerificationEmail } = require('../util/mailer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const appointment = require('../models/appointment');
 const medicalRecord = require('../models/medicalRecord');
 const saltRounds = 10;
 
+
+
 const createUserService = async (name, email, password, role) => {
     try {
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return {
+                EC: 1,
+                EM: "Định dạng email không hợp lệ (ví dụ: abc@gmail.com)"
+            };
+        }
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            return {
+                EC: 1,
+                EM: "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+            };
+        }
         //check email exist
         const user = await User.findOne({ email });
         if (user) {
@@ -20,18 +38,47 @@ const createUserService = async (name, email, password, role) => {
         // Hash the password before saving it
         // const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, saltRounds);
-
+        const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '15m' });
         let result = await User.create({
             name: name,
             email: email,
             password: hashedPassword,
-            role: role
+            role: role,
+            isVerified: false
         })
-        return result;
+        sendVerificationEmail(email, verificationToken);
+        return {
+            EC: 0,
+            EM: "Vui lòng kiểm tra email để kích hoạt tài khoản",
+            result
+        };
 
     } catch (error) {
         console.log(error);
         return null;
+    }
+}
+
+const verifyEmailService = async (token) => {
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const result = await User.findOneAndUpdate({ email: decoded.email }, { isVerified: true });
+        if (!result) {
+            return {
+                EC: 2,
+                EM: "Người dùng không tồn tại"
+            }
+        }
+        return {
+            EC: 0,
+            EM: "Xác thực thành công! Bạn có thể đăng nhập."
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: 1,
+            EM: "Link xác thực không hợp lệ hoặc đã hết hạn."
+        }
     }
 }
 
@@ -40,6 +87,9 @@ const loginService = async (email, password) => {
         // fetch user by email
         const user = await User.findOne({ email: email });
         if (user) {
+            if (!user.isVerified) {
+                return { EC: 3, EM: "Vui lòng xác thực email trước khi đăng nhập" };
+            }
             // compare password
             const isMatch = await bcrypt.compare(password, user.password);
             if (isMatch) {
@@ -289,6 +339,7 @@ module.exports = {
     createAppointmentService,
     getScheduleService,
     cancelScheduleService,
-    getMedicalReportService
+    getMedicalReportService,
+    verifyEmailService
 
 }
